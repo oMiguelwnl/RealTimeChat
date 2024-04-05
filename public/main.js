@@ -20,6 +20,19 @@ function renderUserList() {
   });
 }
 
+function addMessage(type, user, msg) {
+  let ul = document.querySelector(".chatList");
+
+  switch (type) {
+    case "status":
+      ul.innerHTML += "<li class='m-status'>  '+ msg +' </li>";
+      break;
+    case "msg":
+      ul.innerHTML += "<li class='m-txt'><span>'+user+'</span> '+msg+'/li>";
+      break;
+  }
+}
+
 loginInput.addEventListener("keyup", (event) => {
   if (event.keyCode === 13) {
     let name = loginInput.value.trim();
@@ -32,11 +45,25 @@ loginInput.addEventListener("keyup", (event) => {
   }
 });
 
-socket.on("user-ok", (users) => {
+socket.on("user-ok", (list) => {
   loginPage.style.display = "none";
   chatPage.style.display = "flex";
   textInput.focus();
 
+  addMessage("status", null, "Conectado!");
+
   userList = list;
+  renderUserList();
+});
+
+socket.on("list-update", (data) => {
+  if (data.joined) {
+    addMessage("status", null, data.joined + " entrou na sala");
+  }
+
+  if (data.left) {
+    addMessage("status", null, data.joined + " saiu na sala");
+  }
+  userList = data.list;
   renderUserList();
 });
