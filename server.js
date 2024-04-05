@@ -14,12 +14,12 @@ app.use(express.static(path.join(__dirname, "public")));
 let connectedUsers = [];
 
 io.on("connection", (socket) => {
-  console.log("Conexão detectada");
+  console.log("Conexão detectada...");
 
   socket.on("join-request", (username) => {
     socket.username = username;
-
     connectedUsers.push(username);
+    console.log(connectedUsers);
 
     socket.emit("user-ok", connectedUsers);
     socket.broadcast.emit("list-update", {
@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    connectedUsers = connectedUsers.filter((i) => i != socket.username);
+    connectedUsers = connectedUsers.filter((u) => u != socket.username);
 
     socket.broadcast.emit("list-update", {
       left: socket.username,
@@ -42,7 +42,8 @@ io.on("connection", (socket) => {
       username: socket.username,
       message: txt,
     };
-    // socket.emit("show-msg", obj);
+
+    //socket.emit('show-msg', obj);
     socket.broadcast.emit("show-msg", obj);
   });
 });
